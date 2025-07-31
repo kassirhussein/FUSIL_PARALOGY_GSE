@@ -179,6 +179,7 @@ entrez_sets <- lapply(paralogue_lists, function(gene_symbols) {
   entrez_ids[entrez_ids %in% reference_set_entrez]
 })
 
+
 # Remove categories with <5 genes
 entrez_sets <- entrez_sets[sapply(entrez_sets, length) >= 5]
 
