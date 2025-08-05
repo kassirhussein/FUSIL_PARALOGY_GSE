@@ -11,12 +11,12 @@ knitr::opts_chunk$set(
 if (!require("BiocManager", quietly = TRUE))
   install.packages("BiocManager")
 
-BiocManager::install("GO.db")
-BiocManager::install("org.Hs.eg.db")
-BiocManager::install("biomaRt")
-BiocManager::install("ReactomePA")
-BiocManager::install("enrichplot")
-BiocManager::install("clusterProfiler")
+#BiocManager::install("GO.db")
+#BiocManager::install("org.Hs.eg.db")
+#BiocManager::install("biomaRt")
+#BiocManager::install("ReactomePA")
+#BiocManager::install("enrichplot")
+#BiocManager::install("clusterProfiler")
 
 # Load libraries
 library(GO.db)
@@ -103,7 +103,7 @@ enrichment_results_list <- list()
 
 # Loop through each FUSIL bin
 for (cat in categories) {
-  message(paste("🔍 Processing category:", cat))
+  message(paste("Processing category:", cat))
   
   # Subset data for current category
   matching_subset <- fusil_match %>%
@@ -124,11 +124,11 @@ for (cat in categories) {
   gene_set_entrez <- gene_set_entrez[!is.na(gene_set_entrez)]
   gene_set_entrez <- gene_set_entrez[gene_set_entrez %in% reference_set_entrez]
   
-  message(paste("🧬 Genes in test set:", length(gene_set_entrez)))
+  message(paste("Genes in test set:", length(gene_set_entrez)))
   
   # Skip if too few genes
   if (length(gene_set_entrez) < 5) {
-    message(paste("⚠️ Too few genes for enrichment in category:", cat, "- skipping."))
+    message(paste("Too few genes for enrichment in category:", cat, "- skipping."))
     next
   }
   
@@ -144,7 +144,7 @@ for (cat in categories) {
   
   # Skip empty enrichment
   if (is.null(enrichment_result) || nrow(as.data.frame(enrichment_result)) == 0) {
-    message(paste("⚠️ No enrichment found for category:", cat, "- skipping plot."))
+    message(paste("No enrichment found for category:", cat, "- skipping plot."))
     next
   }
   
@@ -154,7 +154,7 @@ for (cat in categories) {
   p <- dotplot(enrichment_result, showCategory = 8) + 
     ggtitle(paste("GO BP Enrichment:", cat))
   
-  message(paste("✅ Analysis done for category:", cat))
+  message(paste("Analysis done for category:", cat))
   print(p)
 }
 
@@ -195,5 +195,27 @@ compare_result <- compareCluster(
 )
 
 # Visualize comparative enrichment across categories
-dotplot(compare_result, showCategory = 5) + 
+dotplot(compare_result, showCategory = 4) + 
   ggtitle("GO BP Comparison Across Categories")
+
+
+
+# Perform cluster-based MF enrichment comparison
+compare_result <- compareCluster(
+  geneCluster = entrez_sets,
+  fun = "enrichGO",
+  OrgDb = org.Hs.eg.db,
+  ont = "MF",
+  universe = reference_set_entrez,
+  pAdjustMethod = "BH",
+  readable = TRUE
+)
+
+# Visualize comparative enrichment across categories
+dotplot(compare_result, showCategory = 5) + 
+  ggtitle("MF BP Comparison Across Categories")
+
+
+
+
+
